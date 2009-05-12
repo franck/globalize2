@@ -355,6 +355,17 @@ class TranslatedTest < ActiveSupport::TestCase
     assert_equal default, with_include
   end
   
+  test "attribute translated before type cast" do
+    Post.locale = :en
+    post = Post.create :subject => 'foo', :content => 'bar'
+    Post.locale = :de
+    post.update_attribute :subject, "German foo"
+    assert_equal 'German foo', post.subject_before_type_cast
+    Post.locale = :en
+    assert_equal 'foo', post.subject_before_type_cast
+  end
+  
+  
   test "setting multiple translations at once with options hash" do
     Post.locale = :de
     post = Post.create :subject => "foo1", :content => "foo1"
