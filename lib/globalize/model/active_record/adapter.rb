@@ -63,6 +63,9 @@ module Globalize
       
       def fetch_attribute(locale, attr_name)
         fallbacks = I18n.fallbacks[locale].map{|tag| tag.to_s}.map(&:to_sym)
+        if @record.respond_to?(:original_locale) and !(original_locale = @record.original_locale).nil?
+          fallbacks = (fallbacks + Array(@record.original_locale).map{|tag| tag.to_sym}).compact.uniq
+        end
         
         # If the translations were included with 
         # :include => globalize_translations

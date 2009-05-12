@@ -458,6 +458,35 @@ class TranslatedTest < ActiveSupport::TestCase
     
     assert_equal 2, translated_comment.globalize_translations.size
   end
+
+  test "can have per-model fallback" do
+    I18n.locale = "es"
+    post = Post.create :subject => "Español"
+    class << post; attr_accessor :original_locale; end
+    
+    I18n.locale = "en"
+    assert_nil post.subject
+    
+    post.original_locale = "es"
+    assert_equal "Español", post.subject
+  end
+  
+  test "can have per-model fallbacks (as array)" do
+    I18n.locale = "es"
+    post = Post.create :subject => "Español"
+    class << post; attr_accessor :original_locale; end
+    I18n.locale = "de"; post.subject = "German"; post.save
+    
+    I18n.locale = "en"
+    assert_nil post.subject
+    
+    post.original_locale = [:de, "es"]
+    assert_equal "German", post.subject
+    
+    I18n.locale = "fr" # to circumvent caching
+    post.original_locale = ["es", :de]
+    assert_equal "Español", post.subject
+  end
 end
 
 # TODO should validate_presence_of take fallbacks into account? maybe we need
