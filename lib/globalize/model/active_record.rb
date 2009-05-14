@@ -26,9 +26,15 @@ module Globalize
             klass.send :define_method, attr_name, lambda {
               globalize.fetch self.class.locale, attr_name
             }
+
+            klass.send :define_method, "#{attr_name}_locale", lambda {|locale|
+              globalize.fetch locale, attr_name
+            }
+            
             klass.send :define_method, "#{attr_name}_before_type_cast", lambda {
               globalize.fetch self.class.locale, attr_name
-            }
+            }        
+            
             klass.send :define_method, "#{attr_name}=", lambda {|val|
               globalize.stash self.class.locale, attr_name, val
               self[attr_name] = val
